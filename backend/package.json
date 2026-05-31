@@ -1,5 +1,10 @@
 {
-  "dependencies": {
-    "nodemailer": "^8.0.9"
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "preview": "vite preview"
   }
 }
