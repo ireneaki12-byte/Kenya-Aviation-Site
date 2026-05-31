@@ -135,6 +135,7 @@ Sprint 2: Booking Flow Development (30 Mar – 19 Apr 2026)
 Sprint 3: Add-ons, AI Assistant & Admin (20 Apr – 10 May 2026)
 Sprint 4: Testing, Deployment & Documentation (11 May – 31 May 2026)
 
+## Trello
 These were captured on Trello on this board: https://trello.com/invite/b/6a146f238ffc5307e80c2e66/ATTI29f40ddfd1a47fb796e0c7818281c2e8B8C1A733/kavsite
 
 ## Project Structure
