@@ -71,7 +71,7 @@ jobs:
           node --version
           npm --version
           npm list vitest
-          ls node_modules/.bin
+          npm exec vitest -- --version
 
       - name: Run frontend component/unit tests
         run: npm test
