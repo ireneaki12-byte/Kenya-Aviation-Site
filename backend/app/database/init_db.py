@@ -1,5 +1,5 @@
 from app.database.connection import Base, engine
-from app.database import models
+import app.database.models  # noqa: F401
 
 
 def init_db():
@@ -8,4 +8,5 @@ def init_db():
 
 if __name__ == "__main__":
     init_db()
+    Base.metadata.create_all(bind=engine)
     print("Database tables created successfully.")

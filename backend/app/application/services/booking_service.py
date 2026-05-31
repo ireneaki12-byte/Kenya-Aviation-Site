@@ -6,7 +6,6 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.application.services import pricing_service
-from app.domain.booking import booking_state
 from app.infrastructure.repositories import postgres_repository as repo
 
 
