@@ -66,18 +66,19 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
-        # --include=dev ensures devDependencies (vitest, vite) are installed.
-        # Do NOT use `npm config set production false` — deprecated in npm 9+.
-        run: npm ci --include=dev
+        # npm ci requires package-lock.json — generate it locally with
+        # `npm install` and commit it before running CI.
+        run: npm ci
 
-      - name: Verify key tools are present
+      - name: Verify tools
         run: |
           node --version
           npm --version
-          npm exec -- vitest --version || true
 
-      - name: Run frontend unit tests
-        run: npm exec -- vitest run
+      - name: Run frontend tests
+        # Uses the "test" script from package.json:
+        # "vitest run --environment jsdom"
+        run: npm test
 
       - name: Build frontend
         run: npm run build
