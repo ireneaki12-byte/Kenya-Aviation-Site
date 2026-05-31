@@ -55,6 +55,7 @@ jobs:
     env:
       NODE_ENV: development
       NPM_CONFIG_PRODUCTION: "false"
+      NPM_CONFIG_BIN_LINKS: "true"
 
     steps:
       - name: Checkout code
@@ -68,18 +69,23 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
-        run: npm ci --include=dev
+        run: |
+          npm config set production false
+          npm config set bin-links true
+          npm ci --include=dev
 
-      - name: Verify frontend test dependencies
+      - name: Verify frontend dependencies
         run: |
           node --version
           npm --version
-          npm config get omit
+          npm config get production
+          npm config get bin-links
           npm list vitest
-          npm exec -- vitest --version
+          ls -la node_modules/vitest || true
+          ls -la node_modules/.bin || true
 
       - name: Run frontend component/unit tests
-        run: npm exec -- vitest run
+        run: node ./node_modules/vitest/vitest.mjs run
 
       - name: Build frontend
         run: npm run build
