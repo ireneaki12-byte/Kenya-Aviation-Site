@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Kenya Aviation Itinerary</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #F5F5F5; font-family: Arial, Helvetica, sans-serif; color: #333; }
+    a { color: #C9A84C; text-decoration: none; }
+  </style>
+</head>
+<body>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F5F5; padding:32px 16px;">
+  <tr><td align="center">
+  <table width="600" cellpadding="0" cellspacing="0"
+         style="max-width:600px; width:100%; border-radius:12px; overflow:hidden;
+                box-shadow:0 4px 24px rgba(0,0,0,0.10);">
+
+    <!-- Header -->
+    <tr>
+      <td style="background:#6B1E2E; padding:22px 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td>
+            <div style="color:#C9A84C; font-size:22px; font-weight:900; letter-spacing:0.04em;">
+              KENYA AVIATION
+            </div>
+            <div style="color:#fff; font-size:10px; letter-spacing:0.1em; opacity:0.8; margin-top:3px;">
+              THE SPIRIT OF EAST AFRICA
+            </div>
+          </td>
+          <td align="right">
+            <div style="background:#C9A84C; color:#6B1E2E; font-size:10px; font-weight:700;
+                        padding:4px 10px; border-radius:4px; display:inline-block;">
+              BOOKING CONFIRMED ✓
+            </div>
+          </td>
+        </tr></table>
+      </td>
+    </tr>
+
+    <!-- Greeting -->
+    <tr>
+      <td style="background:#FBF7ED; padding:24px 28px; border-bottom:2px solid #C9A84C;">
+        <div style="font-size:15px; font-weight:700; color:#6B1E2E; margin-bottom:6px;">
+          Dear {{LEAD_PASSENGER_NAME}},
+        </div>
+        <div style="font-size:13px; color:#555; line-height:1.6;">
+          Thank you for booking with Kenya Aviation. Your booking is confirmed and your
+          itinerary is below. Please keep your booking reference handy for check-in and
+          any future queries.
+        </div>
+      </td>
+    </tr>
+
+    <!-- Booking reference -->
+    <tr>
+      <td style="background:#6B1E2E; padding:18px 28px; text-align:center;">
+        <div style="color:#C9A84C; font-size:10px; font-weight:700; letter-spacing:0.1em;
+                    text-transform:uppercase; margin-bottom:4px;">Booking Reference</div>
+        <div style="color:#fff; font-size:30px; font-weight:900; letter-spacing:0.08em;">
+          {{BOOKING_REF}}
+        </div>
+      </td>
+    </tr>
+
+    <!-- ── OUTBOUND SEGMENT (always present) ─────────────────────────── -->
+    {{OUTBOUND_SEGMENT}}
+
+    <!-- ── RETURN SEGMENT (injected for return trips, empty for one-way) -->
+    {{RETURN_SEGMENT}}
+
+    <!-- Add-ons strip -->
+    <tr>
+      <td style="background:#fff; padding:0 28px 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td width="33%" style="padding-right:6px;">
+            <div style="background:#F8F8F8; border:1px solid #eee; border-radius:6px; padding:10px;">
+              <div style="font-size:8px; color:#C9A84C; font-weight:700; text-transform:uppercase;
+                          letter-spacing:0.06em; margin-bottom:3px;">Seat</div>
+              <div style="font-size:13px; font-weight:700; color:#4A1520;">{{SEAT}}</div>
+            </div>
+          </td>
+          <td width="33%" style="padding-right:6px;">
+            <div style="background:#F8F8F8; border:1px solid #eee; border-radius:6px; padding:10px;">
+              <div style="font-size:8px; color:#C9A84C; font-weight:700; text-transform:uppercase;
+                          letter-spacing:0.06em; margin-bottom:3px;">Baggage</div>
+              <div style="font-size:13px; font-weight:700; color:#4A1520;">{{BAGGAGE}}</div>
+            </div>
+          </td>
+          <td width="33%">
+            <div style="background:#F8F8F8; border:1px solid #eee; border-radius:6px; padding:10px;">
+              <div style="font-size:8px; color:#C9A84C; font-weight:700; text-transform:uppercase;
+                          letter-spacing:0.06em; margin-bottom:3px;">Meal</div>
+              <div style="font-size:13px; font-weight:700; color:#4A1520;">{{MEAL}}</div>
+            </div>
+          </td>
+        </tr></table>
+      </td>
+    </tr>
+
+    <!-- Passengers -->
+    <tr>
+      <td style="background:#fff; padding:0 28px 24px;">
+        <div style="font-size:11px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                    letter-spacing:0.07em; margin-bottom:12px; border-bottom:2px solid #C9A84C;
+                    padding-bottom:6px;">Passengers</div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+          <tr style="background:#FBF7ED;">
+            <td style="font-size:9px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                       letter-spacing:0.06em; padding:8px 10px; border-bottom:1px solid #e8d9c0;">#</td>
+            <td style="font-size:9px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                       letter-spacing:0.06em; padding:8px 10px; border-bottom:1px solid #e8d9c0;">Name</td>
+            <td style="font-size:9px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                       letter-spacing:0.06em; padding:8px 10px; border-bottom:1px solid #e8d9c0;">Type</td>
+            <td style="font-size:9px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                       letter-spacing:0.06em; padding:8px 10px; border-bottom:1px solid #e8d9c0;">Document</td>
+          </tr>
+          {{PASSENGERS_TABLE}}
+        </table>
+      </td>
+    </tr>
+
+    <!-- Payment summary -->
+    <tr>
+      <td style="background:#fff; padding:0 28px 24px;">
+        <div style="font-size:11px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                    letter-spacing:0.07em; margin-bottom:12px; border-bottom:2px solid #C9A84C;
+                    padding-bottom:6px;">Payment Summary</div>
+        <table width="100%" cellpadding="0" cellspacing="6">
+          <tr>
+            <td style="font-size:12px; color:#555; padding:4px 0;">Payment method</td>
+            <td style="font-size:12px; font-weight:600; color:#333; text-align:right;">
+              {{PAYMENT_METHOD}}
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size:12px; color:#555; padding:4px 0; border-top:1px solid #f0f0f0;">
+              Total charged
+            </td>
+            <td style="font-size:16px; font-weight:800; color:#6B1E2E; text-align:right;
+                       border-top:1px solid #f0f0f0;">{{TOTAL}}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Next steps -->
+    <tr>
+      <td style="background:#FBF7ED; padding:20px 28px; border-top:2px solid #C9A84C;
+                 border-bottom:2px solid #C9A84C;">
+        <div style="font-size:11px; font-weight:700; color:#6B1E2E; text-transform:uppercase;
+                    letter-spacing:0.07em; margin-bottom:12px;">Next Steps</div>
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td width="33%" style="vertical-align:top; padding-right:10px;">
+            <div style="font-size:16px; margin-bottom:4px;">🕐</div>
+            <div style="font-size:10px; font-weight:700; color:#6B1E2E; margin-bottom:2px;">
+              Plan your arrival
+            </div>
+            <div style="font-size:9px; color:#555; line-height:1.5;">
+              Allow time for security checks, baggage drop and boarding.
+            </div>
+          </td>
+          <td width="33%" style="vertical-align:top; padding-right:10px;">
+            <div style="font-size:16px; margin-bottom:4px;">🧳</div>
+            <div style="font-size:10px; font-weight:700; color:#6B1E2E; margin-bottom:2px;">
+              Baggage drop
+            </div>
+            <div style="font-size:9px; color:#555; line-height:1.5;">
+              Drop checked baggage at least 45 minutes before departure.
+            </div>
+          </td>
+          <td width="33%" style="vertical-align:top;">
+            <div style="font-size:16px; margin-bottom:4px;">📋</div>
+            <div style="font-size:10px; font-weight:700; color:#6B1E2E; margin-bottom:2px;">
+              Travel documents
+            </div>
+            <div style="font-size:9px; color:#555; line-height:1.5;">
+              Carry a valid ID or passport matching your booking name.
+            </div>
+          </td>
+        </tr></table>
+      </td>
+    </tr>
+
+    <!-- Contact -->
+    <tr>
+      <td style="background:#fff; padding:18px 28px;">
+        <div style="font-size:11px; color:#555; line-height:1.7;">
+          Questions? Contact us at
+          <a href="mailto:info@kenya-aviation.com"
+             style="color:#6B1E2E; font-weight:600;">info@kenya-aviation.com</a>
+          or call <strong>+254 20 827 0000</strong>.<br />
+          This itinerary was sent to <strong>{{CONTACT_EMAIL}}</strong>.
+        </div>
+      </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+      <td style="background:#6B1E2E; padding:16px 28px; text-align:center;">
+        <div style="color:#C9A84C; font-weight:700; font-size:13px; margin-bottom:4px;">
+          KENYA AVIATION
+        </div>
+        <div style="color:#fff; font-size:9px; opacity:0.65;">
+          © {{YEAR}} Kenya Aviation. All rights reserved.
+        </div>
+        <div style="margin-top:6px;">
+          <a href="#" style="color:#C9A84C; font-size:9px; margin:0 8px;">Manage booking</a>
+          <a href="#" style="color:#C9A84C; font-size:9px; margin:0 8px;">Check in online</a>
+          <a href="#" style="color:#C9A84C; font-size:9px; margin:0 8px;">Contact us</a>
+        </div>
+      </td>
+    </tr>
+
+  </table>
+  </td></tr>
+</table>
+</body>
+</html>
