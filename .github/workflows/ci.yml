@@ -6,8 +6,9 @@ on:
   pull_request:
 
 jobs:
+  # ── Backend ────────────────────────────────────────────────────────────────
   backend:
-    name: Backend - Lint, Tests and Audit
+    name: Backend — Lint, Tests and Audit
     runs-on: ubuntu-latest
 
     defaults:
@@ -32,30 +33,26 @@ jobs:
       - name: Install backend dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Install backend test and security tools
+      - name: Install test and security tools
         run: python -m pip install ruff pytest pip-audit
 
-      - name: Lint backend with Ruff
+      - name: Lint with Ruff
         run: python -m ruff check app
 
-      - name: Run backend unit and integration tests
+      - name: Run unit and integration tests
         run: python -m pytest -q
 
-      - name: Backend dependency audit
+      - name: Dependency audit
         run: python -m pip_audit || true
 
+  # ── Frontend ───────────────────────────────────────────────────────────────
   frontend:
-    name: Frontend - Unit Tests, Build and Audit
+    name: Frontend — Tests, Build and Audit
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: frontend
-
-    env:
-      NODE_ENV: development
-      NPM_CONFIG_PRODUCTION: "false"
-      NPM_CONFIG_BIN_LINKS: "true"
 
     steps:
       - name: Checkout code
@@ -69,30 +66,26 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
-        run: |
-          npm config set production false
-          npm config set bin-links true
-          npm ci --include=dev
+        # --include=dev ensures devDependencies (vitest, vite) are installed.
+        # Do NOT use `npm config set production false` — deprecated in npm 9+.
+        run: npm ci --include=dev
 
-      - name: Verify frontend dependencies
+      - name: Verify key tools are present
         run: |
           node --version
           npm --version
-          npm config get production
-          npm config get bin-links
-          npm list vitest
-          ls -la node_modules/vitest || true
-          ls -la node_modules/.bin || true
+          npx vitest --version
 
-      - name: Run frontend component/unit tests
-        run: node ./node_modules/vitest/vitest.mjs run
+      - name: Run frontend unit tests
+        run: npx vitest run
 
       - name: Build frontend
         run: npm run build
 
-      - name: Frontend dependency audit
+      - name: Dependency audit
         run: npm audit --omit=dev || true
 
+  # ── CodeQL ─────────────────────────────────────────────────────────────────
   codeql:
     name: CodeQL Security Analysis
     runs-on: ubuntu-latest
