@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Any
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.application.services.ai_conversation_service import handle_chat
@@ -12,9 +13,10 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = "default-session"
-    # Full conversation history sent from the frontend so the agent
-    # has context across multiple turns.
-    conversation_history: Optional[list] = []
+
+    # Avoid using [] as a default because it is mutable.
+    # Field(default_factory=list) creates a fresh list for each request.
+    conversation_history: list[Any] = Field(default_factory=list)
 
 
 @router.post(
@@ -27,9 +29,16 @@ class ChatRequest(BaseModel):
     ),
 )
 def chat(payload: ChatRequest, db: Session = Depends(get_db)):
-    return handle_chat(
-        db=db,
-        message=payload.message,
-        session_id=payload.session_id or "default-session",
-        conversation_history=payload.conversation_history or [],
-    )
+    try:
+        return handle_chat(
+            db=db,
+            message=payload.message,
+            session_id=payload.session_id or "default-session",
+            conversation_history=payload.conversation_history or [],
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Chat service error: {str(exc)}",
+        )
