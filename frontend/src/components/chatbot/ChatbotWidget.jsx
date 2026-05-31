@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bot, Mic, Send, X, Check } from "lucide-react";
+import { Bot, Mic, MicOff, Send, X, Check, Phone, Mail } from "lucide-react";
 import { chatWithAssistantAgentic } from "../../services/apiClient";
 
 const BURGUNDY   = "#6B1E2E";
@@ -27,7 +27,7 @@ const fieldBase = {
   borderRadius: 6, boxSizing: "border-box",
 };
 
-// ── Renders **bold** and line-breaks from assistant messages ─────────────────
+// ── Renders **bold** and line-breaks ──────────────────────────────────────────
 function MessageText({ text }) {
   if (!text) return null;
   const parts = text.split(/(\*\*[^*]+\*\*|\n)/);
@@ -43,9 +43,42 @@ function MessageText({ text }) {
   );
 }
 
-// ── Structured booking summary card shown inside chat ────────────────────────
+// ── Human escalation card — shown when Claude cannot help ─────────────────────
+function EscalationCard() {
+  return (
+    <div style={{ background: "#fff", border: `2px solid ${GOLD}`, borderRadius: 10,
+                  overflow: "hidden", fontSize: "0.82rem", marginTop: "0.5rem" }}>
+      <div style={{ background: BURGUNDY, color: "#fff", padding: "0.5rem 0.85rem",
+                    fontWeight: 700, fontSize: "0.83rem" }}>
+        🧑‍💼 Speak to our team
+      </div>
+      <div style={{ padding: "0.75rem 0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <Phone size={14} color={BURGUNDY} />
+          <div>
+            <div style={{ fontWeight: 700, color: BURGUNDY, fontSize: "0.8rem" }}>Call us</div>
+            <div style={{ color: "#555" }}>+254 20 827 0000 &nbsp;·&nbsp; Mon–Fri, 8am–6pm EAT</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <Mail size={14} color={BURGUNDY} />
+          <div>
+            <div style={{ fontWeight: 700, color: BURGUNDY, fontSize: "0.8rem" }}>Email us</div>
+            <a href="mailto:info@kenya-aviation.com"
+               style={{ color: BURGUNDY, textDecoration: "none" }}>
+              info@kenya-aviation.com
+            </a>
+            <div style={{ color: "#888", fontSize: "0.74rem" }}>We respond within 2 business hours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Booking summary card ───────────────────────────────────────────────────────
 function ChatSummaryCard({ flight, fare, passenger, addons }) {
-  const bagFee = addons?.extraBaggage?.[0] === "BAG-23" ? 2500
+  const bagFee  = addons?.extraBaggage?.[0] === "BAG-23" ? 2500
     : addons?.extraBaggage?.[0] === "BAG-32" ? 3500
     : addons?.extraBaggage?.[0] === "BAG-46" ? 4800 : 0;
   const mealFee = addons?.meal ? 900 : 0;
@@ -58,9 +91,9 @@ function ChatSummaryCard({ flight, fare, passenger, addons }) {
     ["Passenger",  `${passenger?.title} ${passenger?.firstName} ${passenger?.lastName}`],
     ["Document",   `${passenger?.documentType}: ${passenger?.documentNumber}`],
     ["Contact",    `${passenger?.phone}  ·  ${passenger?.email}`],
-    addons?.seat              && ["Seat",     addons.seat],
-    addons?.extraBaggage?.[0] && ["Baggage",  addons.extraBaggage[0]],
-    addons?.meal              && ["Meal",     addons.meal],
+    addons?.seat              && ["Seat",        addons.seat],
+    addons?.extraBaggage?.[0] && ["Baggage",     addons.extraBaggage[0]],
+    addons?.meal              && ["Meal",        addons.meal],
     ["Taxes & fees", kes(TAXES)],
     bagFee  > 0 && ["Baggage fee", kes(bagFee)],
     mealFee > 0 && ["Meal fee",    kes(mealFee)],
@@ -92,14 +125,13 @@ function ChatSummaryCard({ flight, fare, passenger, addons }) {
   );
 }
 
-// ── Field helper ─────────────────────────────────────────────────────────────
+// ── Field ─────────────────────────────────────────────────────────────────────
 function Field({ label, hint, type = "text", value, onChange, options, required }) {
   return (
     <div style={{ marginBottom: "0.5rem" }}>
       <label style={{ fontSize: "0.75rem", fontWeight: 700, color: BURGUNDY,
                       display: "flex", gap: "0.25rem", marginBottom: 3 }}>
-        {label}
-        {required && <span style={{ color: "#c00" }}>*</span>}
+        {label}{required && <span style={{ color: "#c00" }}>*</span>}
       </label>
       {hint && <div style={{ fontSize: "0.68rem", color: "#888", marginBottom: 3 }}>{hint}</div>}
       {options ? (
@@ -114,7 +146,6 @@ function Field({ label, hint, type = "text", value, onChange, options, required 
   );
 }
 
-// ── Step indicator ────────────────────────────────────────────────────────────
 function StepBadge({ step, total, label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem",
@@ -132,7 +163,6 @@ function StepBadge({ step, total, label }) {
   );
 }
 
-// ── Flight cards ─────────────────────────────────────────────────────────────
 function FlightCards({ flights, onSelect }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -162,9 +192,7 @@ function FlightCards({ flights, onSelect }) {
               </tbody>
             </table>
             <button type="button" style={{ ...primaryBtn, marginTop: "0.5rem" }}
-              onClick={() => onSelect(f)}>
-              Select this flight →
-            </button>
+              onClick={() => onSelect(f)}>Select this flight →</button>
           </div>
         </div>
       ))}
@@ -172,7 +200,6 @@ function FlightCards({ flights, onSelect }) {
   );
 }
 
-// ── Fare cards ────────────────────────────────────────────────────────────────
 function FareCards({ fares, onSelect }) {
   const options = fares?.length ? fares : [
     { id: "basic",     name: "Basic",      amount: 0,
@@ -183,7 +210,7 @@ function FareCards({ fares, onSelect }) {
   return (
     <div>
       <div style={{ fontSize: "0.75rem", color: "#666", marginBottom: "0.5rem", lineHeight: 1.5 }}>
-        Choose a fare package. <strong>Fare Plus+</strong> is recommended for checked baggage and flexibility.
+        Choose a fare. <strong>Fare Plus+</strong> is recommended for checked baggage and flexibility.
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         {options.map((fare) => (
@@ -202,9 +229,7 @@ function FareCards({ fares, onSelect }) {
                 {(fare.items || fare.perks || []).map((p) => <li key={p}>{p}</li>)}
               </ul>
               <button type="button" style={{ ...primaryBtn, marginTop: "0.5rem" }}
-                onClick={() => onSelect(fare)}>
-                Choose {fare.name} →
-              </button>
+                onClick={() => onSelect(fare)}>Choose {fare.name} →</button>
             </div>
           </div>
         ))}
@@ -213,7 +238,6 @@ function FareCards({ fares, onSelect }) {
   );
 }
 
-// ── Passenger form ────────────────────────────────────────────────────────────
 function PassengerFormInline({ onSubmit }) {
   const [form, setForm] = useState({
     title: "Mr", firstName: "", lastName: "",
@@ -278,7 +302,6 @@ function PassengerFormInline({ onSubmit }) {
   );
 }
 
-// ── Addon form ────────────────────────────────────────────────────────────────
 function AddonFormInline({ onSubmit }) {
   const [seat, setSeat] = useState("");
   const [bag,  setBag]  = useState("");
@@ -323,7 +346,6 @@ function AddonFormInline({ onSubmit }) {
   );
 }
 
-// ── Method option button (module-level) ───────────────────────────────────────
 function MethodOption({ id, label, sub, selected, onSelect }) {
   return (
     <button type="button" onClick={() => onSelect(id)} style={{
@@ -347,6 +369,21 @@ function MethodOption({ id, label, sub, selected, onSelect }) {
   );
 }
 
+// ── Detect escalation signals in Claude's response ────────────────────────────
+// Show the EscalationCard automatically when Claude refers to a human agent.
+function needsEscalationCard(text = "") {
+  const lower = text.toLowerCase();
+  return (
+    lower.includes("human agent") ||
+    lower.includes("our team") ||
+    lower.includes("contact us") ||
+    lower.includes("call us") ||
+    lower.includes("speak to") ||
+    lower.includes("info@kenya-aviation") ||
+    lower.includes("+254 20 827")
+  );
+}
+
 // ── Main ChatbotWidget ────────────────────────────────────────────────────────
 export default function ChatbotWidget({
   isOpen, onClose,
@@ -355,31 +392,113 @@ export default function ChatbotWidget({
   setSelectedFare, setPassengerDetails,
   setContactDetails, setAddons,
 }) {
-  // All hooks at the TOP of the component body — never inside nested functions
-  const [messages, setMessages] = useState([{
+  const [messages,             setMessages]             = useState([{
     role: "assistant",
     text: "Hello! ✈️ I'm your Kenya Aviation travel assistant.\n\nI can:\n**• Search flights** — just tell me where and when\n**• Guide your booking** — I'll collect all the details step by step\n**• Answer questions** — baggage, check-in, fares and more\n\nWhere would you like to fly today?",
   }]);
   const [input,               setInput]               = useState("");
   const [loading,             setLoading]             = useState(false);
-  const [step,                setStep]                = useState("chat"); // chat | flights | fares | passenger | addons
+  const [isListening,         setIsListening]         = useState(false);
+  const [step,                setStep]                = useState("chat");
   const [bookingData,         setBookingData]         = useState({});
   const [availableFares,      setAvailableFares]      = useState([]);
   const [inlineFlights,       setInlineFlights]       = useState([]);
   const [conversationHistory, setConversationHistory] = useState([]);
-  const bottomRef = useRef(null);
+
+  const bottomRef       = useRef(null);
+  const recognitionRef  = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, step]);
 
+  // Clean up recognition on unmount
+  useEffect(() => {
+    return () => { recognitionRef.current?.abort(); };
+  }, []);
+
   if (!isOpen) return null;
 
-  function addMsg(role, text) {
-    setMessages((m) => [...m, { role, text }]);
+  function addMsg(role, text, extra = {}) {
+    setMessages((m) => [...m, { role, text, ...extra }]);
   }
 
-  // ── Agentic chat send ───────────────────────────────────────────────────────
+  // ── Voice input — fixed ───────────────────────────────────────────────────
+  function handleVoice() {
+    // If already listening, stop
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SR) {
+      addMsg("assistant",
+        "Voice input is not supported in your browser.\n\n" +
+        "**Supported browsers:** Chrome, Edge, and Safari on iOS.\n" +
+        "Please type your message, or switch to a supported browser to use voice."
+      );
+      return;
+    }
+
+    // Chrome requires HTTPS for the microphone outside of localhost.
+    // Warn the user if they are on http:// in production.
+    if (location.protocol === "http:" && !["localhost","127.0.0.1"].includes(location.hostname)) {
+      addMsg("assistant",
+        "Voice input requires a secure connection (HTTPS). " +
+        "Please contact your administrator to enable HTTPS, or type your message."
+      );
+      return;
+    }
+
+    const recognition = new SR();
+    recognitionRef.current = recognition;
+
+    recognition.lang              = "en-US";
+    recognition.continuous        = false;   // stop after one utterance
+    recognition.interimResults    = false;   // wait for the final result only
+    recognition.maxAlternatives   = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setInput(transcript);         // populate the text box
+      setIsListening(false);
+      // Auto-focus the input so the user can review before sending
+    };
+
+    recognition.onerror = (e) => {
+      setIsListening(false);
+      const messages = {
+        "not-allowed":       "Microphone access was denied.\n\nTo fix this: click the 🔒 icon in your browser's address bar → Site settings → Microphone → Allow, then try again.",
+        "no-speech":         "No speech was detected. Please try again and speak clearly into your microphone.",
+        "audio-capture":     "No microphone was found. Please connect a microphone and try again.",
+        "network":           "A network error occurred with voice recognition. Please check your connection or type your message.",
+        "service-not-allowed": "Voice recognition is blocked. This may be because the page is not served over HTTPS.",
+      };
+      addMsg("assistant", messages[e.error] ||
+        `Voice input encountered an error (${e.error}). Please type your message instead.`
+      );
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      addMsg("assistant", "Could not start voice input. Please type your message.");
+    }
+  }
+
+  // ── Agentic send ──────────────────────────────────────────────────────────
   async function sendMessage() {
     const message = input.trim();
     if (!message) return;
@@ -395,9 +514,12 @@ export default function ChatbotWidget({
       });
 
       if (response.updated_history) setConversationHistory(response.updated_history);
-      if (response.response)        addMsg("assistant", response.response);
 
-      // Agentic navigate — Claude collected everything
+      if (response.response) {
+        const showCard = needsEscalationCard(response.response);
+        addMsg("assistant", response.response, { showEscalation: showCard });
+      }
+
       if (response.action?.type === "navigate") {
         const s = response.action.booking_state;
         applyBookingState(s);
@@ -406,7 +528,6 @@ export default function ChatbotWidget({
         return;
       }
 
-      // Inline flight list from agent context
       const flights = response.context?.flights || [];
       if (flights.length > 0) {
         addMsg("assistant", `I found **${flights.length} flight${flights.length > 1 ? "s" : ""}** on this route. Please select one:`);
@@ -414,15 +535,17 @@ export default function ChatbotWidget({
         setStep("flights");
       }
 
-    } catch (err) {
-      console.error("Chat error:", err);
-      addMsg("assistant", "Something went wrong — please check the backend is running and try again.");
+    } catch {
+      addMsg("assistant",
+        "I'm having trouble connecting right now.\n\n" +
+        "Please try again in a moment, or contact our team directly:",
+        { showEscalation: true }
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  // Sets all parent-app state from a booking_state object
   function applyBookingState(s) {
     if (s.selectedFlight       && setSelectedFlight)       setSelectedFlight(s.selectedFlight);
     if (s.selectedReturnFlight && setSelectedReturnFlight) setSelectedReturnFlight(s.selectedReturnFlight);
@@ -433,7 +556,6 @@ export default function ChatbotWidget({
     if (s.addons               && setAddons)               setAddons(s.addons);
   }
 
-  // ── Manual booking flow handlers ────────────────────────────────────────────
   function handleFlightSelect(flight) {
     setBookingData((b) => ({ ...b, flight }));
     if (setResults)        setResults([flight]);
@@ -475,52 +597,27 @@ export default function ChatbotWidget({
     setStep("addons");
   }
 
-  // ── KEY FIX: after addons, set ALL parent-app state then navigate ──────────
   function handleAddonSubmit(addons) {
     const { flight, fare, passenger } = { ...bookingData };
-
-    // Build the parent-app state objects
-    const passengerList = [{
-      ...passenger,
-      category:     "adult",
-      passengerKey: "adult-1",
-      label:        "Adult 1",
-    }];
-
+    const passengerList = [{ ...passenger, category: "adult", passengerKey: "adult-1", label: "Adult 1" }];
     const contactDetails = {
-      title:        passenger?.title        || "",
-      firstName:    passenger?.firstName    || "",
-      lastName:     passenger?.lastName     || "",
-      email:        passenger?.email        || "",
-      confirmEmail: passenger?.email        || "",
-      phone:        passenger?.phone        || "",
-      country:      "Kenya",
-      city:         "",
-      address:      "",
+      title: passenger?.title || "", firstName: passenger?.firstName || "",
+      lastName: passenger?.lastName || "", email: passenger?.email || "",
+      confirmEmail: passenger?.email || "", phone: passenger?.phone || "",
+      country: "Kenya", city: "", address: "",
     };
 
-    // Set every piece of parent-app state
     if (setSelectedFlight)   setSelectedFlight(flight);
     if (setSelectedFare)     setSelectedFare(fare);
     if (setPassengerDetails) setPassengerDetails(passengerList);
     if (setContactDetails)   setContactDetails(contactDetails);
     if (setAddons)           setAddons(addons);
 
-    // Show formatted summary inside the chat
     setBookingData((b) => ({ ...b, addons }));
     setMessages((m) => [
       ...m,
-      {
-        role:    "summary_card",
-        flight,
-        fare,
-        passenger,
-        addons,
-      },
-      {
-        role: "assistant",
-        text: "Here's your full booking summary above. ☝️\n\nEverything looks good? Click **Proceed to payment** to review and pay on the next page.",
-      },
+      { role: "summary_card", flight, fare, passenger, addons },
+      { role: "assistant", text: "Here's your full booking summary above. ☝️\n\nEverything looks good? Click **Proceed to payment** to review and pay on the next page." },
     ]);
     setStep("ready");
   }
@@ -530,75 +627,23 @@ export default function ChatbotWidget({
     setTimeout(() => { onClose(); setPage("summary"); }, 600);
   }
 
-  // ── Voice input ─────────────────────────────────────────────────────────────
-  function handleVoice() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { addMsg("assistant", "Voice input is not supported in this browser. Please type."); return; }
-    const r = new SR(); r.lang = "en-US";
-    r.onresult = (e) => setInput(e.results[0][0].transcript);
-    r.start();
-  }
-
-  // ── Inline step component ───────────────────────────────────────────────────
   function renderStep() {
     switch (step) {
-      case "flights":
-        return (
-          <>
-            <StepBadge step={1} total={4} label="Select your flight" />
-            <div style={{ padding: "0.5rem" }}>
-              <FlightCards flights={inlineFlights} onSelect={handleFlightSelect} />
-            </div>
-          </>
-        );
-      case "fares":
-        return (
-          <>
-            <StepBadge step={2} total={4} label="Choose a fare" />
-            <div style={{ padding: "0.5rem" }}>
-              <FareCards fares={availableFares} onSelect={handleFareSelect} />
-            </div>
-          </>
-        );
-      case "passenger":
-        return (
-          <>
-            <StepBadge step={3} total={4} label="Passenger details" />
-            <div style={{ padding: "0.5rem" }}>
-              <PassengerFormInline onSubmit={handlePassengerSubmit} />
-            </div>
-          </>
-        );
-      case "addons":
-        return (
-          <>
-            <StepBadge step={4} total={4} label="Add-on services (optional)" />
-            <div style={{ padding: "0.5rem" }}>
-              <AddonFormInline onSubmit={handleAddonSubmit} />
-            </div>
-          </>
-        );
-      case "ready":
-        return (
-          <div style={{ padding: "0.5rem" }}>
-            <button type="button"
-              style={{ ...primaryBtn, fontSize: "0.92rem", padding: "0.65rem",
-                       background: BURGUNDY, letterSpacing: "0.02em" }}
-              onClick={handleProceedToPayment}>
-              ✈️ Proceed to payment →
-            </button>
-          </div>
-        );
-      default:
-        return null;
+      case "flights":  return (<><StepBadge step={1} total={4} label="Select your flight" /><div style={{ padding: "0.5rem" }}><FlightCards flights={inlineFlights} onSelect={handleFlightSelect} /></div></>);
+      case "fares":    return (<><StepBadge step={2} total={4} label="Choose a fare" /><div style={{ padding: "0.5rem" }}><FareCards fares={availableFares} onSelect={handleFareSelect} /></div></>);
+      case "passenger":return (<><StepBadge step={3} total={4} label="Passenger details" /><div style={{ padding: "0.5rem" }}><PassengerFormInline onSubmit={handlePassengerSubmit} /></div></>);
+      case "addons":   return (<><StepBadge step={4} total={4} label="Add-on services (optional)" /><div style={{ padding: "0.5rem" }}><AddonFormInline onSubmit={handleAddonSubmit} /></div></>);
+      case "ready":    return (<div style={{ padding: "0.5rem" }}><button type="button" style={{ ...primaryBtn, fontSize: "0.92rem", padding: "0.65rem" }} onClick={handleProceedToPayment}>✈️ Proceed to payment →</button></div>);
+      default: return null;
     }
   }
+
+  const stepEl = renderStep();
 
   return (
     <div className="chatbot-overlay">
       <section className="chatbot-panel">
 
-        {/* Header */}
         <header className="chatbot-header">
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <Bot size={18} color={GOLD} />
@@ -613,26 +658,41 @@ export default function ChatbotWidget({
           </button>
         </header>
 
-        {/* Messages */}
+        {/* Listening banner */}
+        {isListening && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: "0.6rem",
+            padding: "0.4rem 0.9rem", background: "#fee2e2",
+            borderBottom: "1px solid #fca5a5", fontSize: "0.78rem", color: "#991b1b",
+          }}>
+            <span style={{
+              width: 10, height: 10, borderRadius: "50%", background: "#dc2626",
+              animation: "pulse 1s infinite", flexShrink: 0,
+              boxShadow: "0 0 0 0 rgba(220,38,38,0.4)",
+            }} />
+            <span><strong>Listening…</strong> Speak now. Click the mic again to stop.</span>
+          </div>
+        )}
+
         <div className="chatbot-messages">
           {messages.map((msg, i) => {
-            // Special: structured summary card
             if (msg.role === "summary_card") {
               return (
                 <div key={i} style={{ padding: "0.4rem 0.5rem" }}>
-                  <ChatSummaryCard
-                    flight={msg.flight} fare={msg.fare}
+                  <ChatSummaryCard flight={msg.flight} fare={msg.fare}
                     passenger={msg.passenger} addons={msg.addons} />
                 </div>
               );
             }
             return (
-              <div key={i}
-                className={msg.role === "user" ? "chat-message user-message" : "chat-message assistant-message"}>
+              <div key={i} className={msg.role === "user" ? "chat-message user-message" : "chat-message assistant-message"}>
                 {msg.role === "assistant" && <Bot size={15} style={{ flexShrink: 0, marginTop: 2 }} />}
-                <p style={{ margin: 0, lineHeight: 1.55 }}>
-                  <MessageText text={msg.text} />
-                </p>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, lineHeight: 1.55 }}>
+                    <MessageText text={msg.text} />
+                  </p>
+                  {msg.showEscalation && <EscalationCard />}
+                </div>
               </div>
             );
           })}
@@ -644,38 +704,46 @@ export default function ChatbotWidget({
             </div>
           )}
 
-          {/* Inline step panel */}
-          {renderStep() && (
-            <div style={{ margin: "0.25rem 0" }}>{renderStep()}</div>
-          )}
-
+          {stepEl && <div style={{ margin: "0.25rem 0" }}>{stepEl}</div>}
           <div ref={bottomRef} />
         </div>
 
-        {/* Input row — large, readable font */}
+        {/* Input row */}
         <div className="chatbot-input-row"
           style={{ padding: "0.65rem 0.75rem", gap: "0.5rem", alignItems: "center",
                    borderTop: "1px solid #e5e7eb", background: "#fff" }}>
-          <button type="button" onClick={handleVoice} aria-label="Voice input"
-            style={{ flexShrink: 0, background: "none", border: "none",
-                     cursor: "pointer", color: BURGUNDY, padding: "0.25rem" }}>
-            <Mic size={20} />
+
+          {/* Mic button — changes appearance when listening */}
+          <button type="button" onClick={handleVoice} aria-label={isListening ? "Stop recording" : "Start voice input"}
+            title={isListening ? "Click to stop recording" : "Click to speak"}
+            style={{
+              flexShrink: 0, border: "none", borderRadius: 8, cursor: "pointer",
+              padding: "0.45rem", display: "flex", alignItems: "center", justifyContent: "center",
+              background: isListening ? "#fee2e2" : "none",
+              color: isListening ? "#dc2626" : BURGUNDY,
+              transition: "background 0.2s, color 0.2s",
+            }}>
+            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
           </button>
+
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
             placeholder={
+              isListening      ? "Listening — speak now…" :
               step === "chat"  ? "Ask about flights, baggage, check-in…" :
               step === "ready" ? "Any questions before you pay?" :
                                  "Type a message or use the form above"
             }
             style={{
               flex: 1, fontSize: "1rem", padding: "0.6rem 0.85rem",
-              borderRadius: 8, border: "1.5px solid #ddd",
-              outline: "none", lineHeight: 1.4,
+              borderRadius: 8, border: `1.5px solid ${isListening ? "#fca5a5" : "#ddd"}`,
+              outline: "none", lineHeight: 1.4, transition: "border-color 0.2s",
+              background: isListening ? "#fff7f7" : "#fff",
             }}
           />
+
           <button type="button" onClick={sendMessage} aria-label="Send"
             style={{ flexShrink: 0, background: BURGUNDY, border: "none",
                      borderRadius: 8, padding: "0.55rem 0.7rem",
@@ -683,6 +751,15 @@ export default function ChatbotWidget({
             <Send size={18} />
           </button>
         </div>
+
+        {/* Pulse animation for the listening dot */}
+        <style>{`
+          @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
+            70%  { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+            100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+          }
+        `}</style>
 
       </section>
     </div>
