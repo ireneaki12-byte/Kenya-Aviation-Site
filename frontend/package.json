@@ -4,26 +4,26 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 5173",
-    "build": "vite build",
+    "dev":     "vite --host 0.0.0.0 --port 5173",
+    "build":   "vite build",
     "preview": "vite preview",
-    "test": "vitest run --environment jsdom",
-    "e2e": "playwright test"
+    "test":    "vitest run --environment jsdom",
+    "e2e":     "playwright test"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "lucide-react": "^0.383.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.15.1",
-    "vite": "^5.4.19"
+    "@vitejs/plugin-react": "latest",
+    "lucide-react":         "latest",
+    "react":                "latest",
+    "react-dom":            "latest",
+    "react-router-dom":     "latest",
+    "vite":                 "latest"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^14.5.2",
-    "jsdom": "^25.0.1",
-    "vitest": "^2.1.8"
+    "@playwright/test":          "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react":    "latest",
+    "@testing-library/user-event": "latest",
+    "jsdom":                     "latest",
+    "vitest":                    "latest"
   }
 }
