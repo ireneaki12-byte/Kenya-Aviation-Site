@@ -66,9 +66,9 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
-        # npm ci requires package-lock.json — generate it locally with
-        # `npm install` and commit it before running CI.
-        run: npm ci
+        # --include=dev is explicit so devDependencies (vitest, jsdom) are
+        # always installed regardless of the CI environment's NODE_ENV value.
+        run: npm ci --include=dev
 
       - name: Verify tools
         run: |
@@ -76,8 +76,6 @@ jobs:
           npm --version
 
       - name: Run frontend tests
-        # Uses the "test" script from package.json:
-        # "vitest run --environment jsdom"
         run: npm test
 
       - name: Build frontend
