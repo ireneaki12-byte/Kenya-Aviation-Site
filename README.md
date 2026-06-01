@@ -100,7 +100,7 @@ A monolith was chosen over microservices because:
 
 Patterns Used:
 - Repository Pattern - This acts as the protective shield and structural bridge between your PostgreSQL database, the State Machine and the Server-Authoritative Pricing engine. It protects the integrity of the state machine, secures server authoritative pricing and prevents database sprawl making it easier to maintain.
-- State Machine - Since the booking process is multistate, this pattern would ensure booking can only be in one official status at a time, and it can only move to a new status by following exact and pre-approved paths.
+- State Machine - Since the booking process is multistate, this pattern would ensure booking can only be in one official status at a time and it can only move to a new status by following exact and pre-approved paths.
 - Server Authoritative Control - The server authoritative pattern was adopted to ensure that business-critical calculations and validations are performed by the backend rather than the client to avoid manipulation. This way, there is a single source of truth. This improves security, consistency, auditability and reliability for a multi-user booking platform.
 - Factory Pattern - This was used to create unique booking references without exposing the DB internals.
 
