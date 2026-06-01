@@ -3,7 +3,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from app.core.security import verify_token
+from app.core.security import verify_admin_token
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -23,7 +23,7 @@ def require_admin(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    payload = verify_token(credentials.credentials)
+    payload = verify_admin_token(credentials.credentials)
 
     if not payload:
         raise HTTPException(
